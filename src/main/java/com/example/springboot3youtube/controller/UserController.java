@@ -1,22 +1,32 @@
 package com.example.springboot3youtube.controller;
 
-import com.example.springboot3youtube.request.UserUpdateRequest;
+import com.example.springboot3youtube.dto.request.ApiRespone;
+import com.example.springboot3youtube.dto.request.UserUpdateRequest;
+import com.example.springboot3youtube.dto.respone.UserRespone;
 import com.example.springboot3youtube.entity.User;
-import com.example.springboot3youtube.request.UserCreationRequest;
+import com.example.springboot3youtube.dto.request.UserCreationRequest;
 import com.example.springboot3youtube.service.UserService;
+import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController("/users")
+@RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class UserController {
-    @Autowired
     private UserService userService;
 
-    @PostMapping()
-    User createUser(@RequestBody UserCreationRequest userCreationRequest){
-       return userService.createUser(userCreationRequest);
+    @PostMapping
+    ApiRespone<User> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest){
+        ApiRespone<User> result = new ApiRespone<>();
+        result.setResult(userService.createUser(userCreationRequest));
+       return result;
     }
 
     @GetMapping
@@ -25,12 +35,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    User getUser(@PathVariable("userId") String userId){
+    UserRespone getUser(@PathVariable("userId") String userId){
         return userService.getUserById(userId);
     }
 
     @PutMapping("/{userId}")
-    User updateUser(
+    UserRespone updateUser(
             @PathVariable("userId") String userId,
             @RequestBody UserUpdateRequest request){
         return userService.updateUser(userId,request);
