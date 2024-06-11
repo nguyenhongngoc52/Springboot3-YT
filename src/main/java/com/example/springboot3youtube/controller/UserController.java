@@ -10,7 +10,9 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,32 +20,39 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserController {
-    private UserService userService;
+  private UserService userService;
 
-    @PostMapping
-    ApiRespone<User> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest){
-        ApiRespone<User> result = new ApiRespone<>();
-        result.setResult(userService.createUser(userCreationRequest));
-       return result;
-    }
+  @PostMapping
+  ApiRespone<User> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest) {
+    ApiRespone<User> result = new ApiRespone<>();
+    result.setResult(userService.createUser(userCreationRequest));
+    return result;
+  }
 
-    @GetMapping
-    List<User> getUsers(){
-        return userService.getUsers();
-    }
+  @GetMapping
+  ApiRespone<List<UserRespone>> getUsers() {
+    var authentication = SecurityContextHolder.getContext().getAuthentication();
+    log.info("Username: {}", authentication.getName());
+    authentication.getAuthorities().forEach(logcheck -> {
+      log.info(logcheck.getAuthority());
+    });
 
-    @GetMapping("/{userId}")
-    UserRespone getUser(@PathVariable("userId") String userId){
-        return userService.getUserById(userId);
-    }
+    return ApiRespone.<List<UserRespone>>builder().result(userService.getUsers()).build();
+  }
 
-    @PutMapping("/{userId}")
-    UserRespone updateUser(
-            @PathVariable("userId") String userId,
-            @RequestBody UserUpdateRequest request){
-        return userService.updateUser(userId,request);
-    }
+  @GetMapping("/{userId}")
+  UserRespone getUser(@PathVariable("userId") String userId) {
+    return userService.getUserById(userId);
+  }
+
+  @PutMapping("/{userId}")
+  UserRespone updateUser(
+       @PathVariable("userId") String userId,
+       @RequestBody UserUpdateRequest request) {
+    return userService.updateUser(userId, request);
+  }
 
 }

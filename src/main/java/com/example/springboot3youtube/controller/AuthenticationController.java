@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
 public class AuthenticationController {
   private AuthenticationService authenticationService;
-  @PostMapping("/log-in")
+  @PostMapping("/token")
   ApiRespone<AuthenticationRespone> authenticate(@RequestBody AuthenticationRequest request){
     var result = authenticationService.authenticate(request);
     return ApiRespone.<AuthenticationRespone>builder()
