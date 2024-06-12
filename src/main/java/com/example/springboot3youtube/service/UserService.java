@@ -14,4 +14,6 @@ public interface UserService {
     UserRespone getUserById(String userId);
 
     UserRespone updateUser(String userId  , UserUpdateRequest userUpdateRequest);
+
+    UserRespone getMyInfo();
 }

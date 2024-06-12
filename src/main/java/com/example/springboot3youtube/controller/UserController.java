@@ -44,15 +44,23 @@ public class UserController {
   }
 
   @GetMapping("/{userId}")
-  UserRespone getUser(@PathVariable("userId") String userId) {
-    return userService.getUserById(userId);
+  ApiRespone<UserRespone> getUser(@PathVariable("userId") String userId) {
+    return ApiRespone.<UserRespone>builder()
+         .result(userService.getUserById(userId)).build();
+  }
+
+  @GetMapping("/myInfo")
+  ApiRespone<UserRespone> getMyInfo() {
+    return ApiRespone.<UserRespone>builder()
+         .result(userService.getMyInfo()).build();
   }
 
   @PutMapping("/{userId}")
-  UserRespone updateUser(
+  ApiRespone<UserRespone> updateUser(
        @PathVariable("userId") String userId,
        @RequestBody UserUpdateRequest request) {
-    return userService.updateUser(userId, request);
+    return ApiRespone.<UserRespone>builder()
+         .result(userService.updateUser(userId, request)).build();
   }
 
 }
