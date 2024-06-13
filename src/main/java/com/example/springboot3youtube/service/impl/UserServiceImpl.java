@@ -8,12 +8,14 @@ import com.example.springboot3youtube.enums.Role;
 import com.example.springboot3youtube.exception.AppException;
 import com.example.springboot3youtube.exception.ErrorCode;
 import com.example.springboot3youtube.mapper.UserMapper;
+import com.example.springboot3youtube.repository.RoleRepository;
 import com.example.springboot3youtube.repository.UserRepository;
 import com.example.springboot3youtube.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
   private UserRepository userRepository;
   private UserMapper userMapper;
   private PasswordEncoder passwordEncoder;
+  private RoleRepository  roleRepository;
 
   @Override
   public User createUser(UserCreationRequest request) {
@@ -41,10 +44,13 @@ public class UserServiceImpl implements UserService {
 
     HashSet<String> roles = new HashSet<>();
     roles.add(Role.USER.name());
-    user.setRoles(roles);
+
+//    user.setRoles(new HashSet<>(request.get));
+
     return userRepository.save(user);
   }
 
+//  @PreAuthorize("hasAnyAuthority('APPROVE_POST')")
   @Override
   public List<UserRespone> getUsers() {
     return userRepository.findAll().stream().map(userMapper::toUserRespone).toList();
@@ -61,8 +67,11 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserRespone updateUser(String userId, UserUpdateRequest request) {
     Integer id = Integer.valueOf(userId);
-    User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("user not found"));
+    User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     userMapper.updateUser(user, request);
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    var roles = roleRepository.findAllById(request.getRoles());
+    user.setRoles(new HashSet<>(roles));
     return userMapper.toUserRespone(userRepository.save(user));
   }
 

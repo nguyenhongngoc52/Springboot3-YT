@@ -15,7 +15,8 @@ public enum ErrorCode {
 
   INVALID_KEY(1001,"Invalid message key",HttpStatus.BAD_REQUEST),
   UNAUTHENTICATED(1006,"Unauthenticated",HttpStatus.UNAUTHORIZED),
-  UNAUTHORIZED(1007,"You do not have permission",HttpStatus.FORBIDDEN)
+  UNAUTHORIZED(1007,"You do not have permission",HttpStatus.FORBIDDEN),
+  INVALID_DOB(1008,"Invalid date of birth {min}",HttpStatus.BAD_REQUEST)
   ;
   private int code ;
   private String message;

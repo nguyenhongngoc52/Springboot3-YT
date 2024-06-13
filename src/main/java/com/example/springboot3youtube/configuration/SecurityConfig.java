@@ -1,6 +1,7 @@
 package com.example.springboot3youtube.configuration;
 
 import com.example.springboot3youtube.enums.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,9 +23,12 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/token", "/auth/introspect"};
+  private final String[] PUBLIC_ENDPOINTS = {"/users", "/auth/token", "/auth/introspect","/auth/logout","/auth/refresh"};
 
   private final String SECRET_KEY = "4wrC2npX87qo9RF8e9DCo3XE6Sw6NPDcVjXAHw7Mc0zVJDofIMquOeKrWMy3bJus";
+
+  @Autowired
+  private CustomJwtDecoder jwtDecoder;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -39,7 +43,7 @@ public class SecurityConfig {
     //check token ở các request khác
     httpSecurity.oauth2ResourceServer(oauth2 ->
          oauth2.jwt(jwtConfigurer ->
-              jwtConfigurer.decoder(jwtDecoder())
+              jwtConfigurer.decoder(jwtDecoder)
                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
 
          ).authenticationEntryPoint(new JwtAuthenticationEntryPoint())
@@ -50,18 +54,9 @@ public class SecurityConfig {
   }
 
   @Bean
-  JwtDecoder jwtDecoder() {
-    SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS512");
-
-    return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-         .macAlgorithm(MacAlgorithm.HS512)
-         .build();
-  }
-
-  @Bean
   JwtAuthenticationConverter jwtAuthenticationConverter(){
     JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+    jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
     JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
     jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     return jwtAuthenticationConverter;

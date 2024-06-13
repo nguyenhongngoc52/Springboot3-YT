@@ -11,3 +11,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+jwt:
+  valid-duration: 5 #in seconds
+  refreshable-duration: 120 #in seconds

@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
   User toUser(UserCreationRequest userCreationRequest);
+  @Mapping(target = "roles" ,ignore = true)
   void updateUser(@MappingTarget User user , UserUpdateRequest userUpdateRequest); //define là request sẽ mapping vào user
 
 //  @Mapping(source ="firstName" ,target = "lastName") mapping tuwf fisrtname sang lastname
